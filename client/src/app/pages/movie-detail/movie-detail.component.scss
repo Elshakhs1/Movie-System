@@ -1,0 +1,450 @@
+.movie-detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #3498db;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 15px;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.movie-content {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.movie-header {
+  display: flex;
+  background-color: #f5f5f5;
+  padding: 25px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+  
+  .poster-container {
+    flex: 0 0 300px;
+    margin-right: 30px;
+    
+    @media (max-width: 768px) {
+      margin-right: 0;
+      margin-bottom: 20px;
+      flex: none;
+      align-self: center;
+    }
+    
+    .movie-poster {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+  }
+  
+  .movie-info {
+    flex: 1;
+    
+    .movie-title {
+      font-size: 32px;
+      margin: 0 0 10px;
+      color: #2c3e50;
+    }
+    
+    .movie-meta {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      color: #7f8c8d;
+      font-size: 16px;
+      
+      span {
+        margin-right: 15px;
+        position: relative;
+        
+        &:not(:last-child)::after {
+          content: '•';
+          position: absolute;
+          right: -10px;
+        }
+      }
+    }
+  }
+}
+
+.rating-section {
+  margin-top: 20px;
+  
+  .average-rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    
+    .rating-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #f39c12;
+      margin-right: 10px;
+    }
+    
+    .rating-stars {
+      color: #f39c12;
+      font-size: 20px;
+      margin-right: 10px;
+    }
+    
+    .rating-count {
+      color: #95a5a6;
+      font-size: 14px;
+    }
+  }
+  
+  .user-rating {
+    margin-top: 15px;
+    
+    p {
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    .star-rating {
+      font-size: 24px;
+      color: #bdc3c7;
+      cursor: pointer;
+      
+      .fa-star {
+        color: #f39c12;
+      }
+    }
+    
+    .btn-submit-rating {
+      margin-top: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: #2980b9;
+      }
+      
+      &:disabled {
+        background-color: #95a5a6;
+        cursor: not-allowed;
+      }
+    }
+  }
+  
+  .login-to-rate {
+    margin-top: 15px;
+    
+    a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: 500;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.movie-details {
+  padding: 25px;
+  
+  .plot-section {
+    margin-bottom: 30px;
+    
+    h2 {
+      font-size: 22px;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+    
+    .description {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #34495e;
+    }
+  }
+  
+  .details-section {
+    display: flex;
+    flex-wrap: wrap;
+    
+    .detail-item {
+      flex: 1 0 50%;
+      margin-bottom: 25px;
+      min-width: 250px;
+      
+      h3 {
+        font-size: 18px;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-weight: 500;
+      }
+    }
+    
+    .cast-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      
+      .cast-item {
+        display: flex;
+        align-items: center;
+        width: 48%;
+        min-width: 200px;
+        margin-bottom: 10px;
+        
+        .actor-image {
+          width: 50px;
+          height: 50px;
+          overflow: hidden;
+          border-radius: 50%;
+          margin-right: 10px;
+          
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+        
+        .actor-info {
+          display: flex;
+          flex-direction: column;
+          
+          .actor-name {
+            font-weight: 500;
+            color: #34495e;
+          }
+          
+          .actor-role {
+            font-size: 14px;
+            color: #7f8c8d;
+          }
+        }
+      }
+    }
+  }
+}
+
+.rating-stats {
+  padding: 0 25px 25px;
+  
+  h2 {
+    font-size: 22px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 500;
+  }
+  
+  .rating-bars {
+    .rating-bar {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      
+      .rating-label {
+        width: 40px;
+        color: #7f8c8d;
+        font-size: 14px;
+      }
+      
+      .bar-container {
+        flex: 1;
+        height: 15px;
+        background-color: #ecf0f1;
+        border-radius: 10px;
+        margin: 0 15px;
+        overflow: hidden;
+        
+        .bar {
+          height: 100%;
+          background-color: #f39c12;
+          border-radius: 10px;
+        }
+      }
+      
+      .rating-count, .rating-percentage {
+        color: #7f8c8d;
+        font-size: 14px;
+        width: 45px;
+        text-align: right;
+      }
+      
+      .rating-percentage {
+        margin-left: 10px;
+      }
+    }
+  }
+}
+
+.comments-section {
+  padding: 25px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #e0e0e0;
+  
+  h2 {
+    font-size: 22px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 500;
+  }
+  
+  .add-comment {
+    margin-bottom: 25px;
+    
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      resize: vertical;
+      font-family: inherit;
+      font-size: 14px;
+      
+      &:focus {
+        outline: none;
+        border-color: #3498db;
+      }
+      
+      &:disabled {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+      }
+    }
+    
+    .btn-submit-comment {
+      margin-top: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: #2980b9;
+      }
+      
+      &:disabled {
+        background-color: #95a5a6;
+        cursor: not-allowed;
+      }
+    }
+  }
+  
+  .login-to-comment {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #edf2f7;
+    border-radius: 5px;
+    text-align: center;
+    
+    a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: 500;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  .comments-list {
+    .comment-item {
+      background-color: white;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      
+      .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        
+        .comment-user {
+          font-weight: 500;
+          color: #2c3e50;
+        }
+        
+        .comment-date {
+          color: #95a5a6;
+          font-size: 12px;
+        }
+        
+        .comment-actions {
+          .btn-delete-comment {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            
+            &:hover {
+              color: #c0392b;
+            }
+          }
+        }
+      }
+      
+      .comment-content {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #34495e;
+        word-break: break-word;
+      }
+    }
+  }
+  
+  .no-comments {
+    text-align: center;
+    padding: 20px;
+    color: #7f8c8d;
+    font-style: italic;
+  }
+} 

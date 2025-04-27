@@ -62,7 +62,26 @@ export class MoviesService {
   }
 
   async findById(id: string): Promise<Movie> {
-    const movie = await this.movieModel.findById(id).exec();
+    const movie = await this.movieModel.findById(id)
+      .populate('director', 'name bio')
+      .populate('artists', 'name bio')
+      .populate({
+        path: 'ratings',
+        populate: {
+          path: 'userId',
+          select: 'name email'
+        }
+      })
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'userId',
+          select: 'name email'
+        },
+        options: { sort: { createdAt: -1 } }
+      })
+      .exec();
+    
     if (!movie) {
       throw new NotFoundException('Movie not found');
     }

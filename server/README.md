@@ -1,6 +1,66 @@
 # Movie System API
 
-This is a RESTful API for a movie management system, built with NestJS and MongoDB.
+## Description
+
+This is the backend API for the Movie System application.
+
+## Installation
+
+```bash
+$ npm install
+```
+
+## Running the app
+
+```bash
+# development
+$ npm run start
+
+# watch mode
+$ npm run start:dev
+
+# production mode
+$ npm run start:prod
+```
+
+## Populating Database with Test Data
+
+To populate the database with sample movies, users, ratings, and comments, run:
+
+```bash
+$ npm run seed
+```
+
+This will:
+1. Clear all existing data in the database
+2. Create 5 users (including an admin account)
+3. Create 8 artists (directors and actors)
+4. Create 5 movies
+5. Generate random ratings for all movies
+6. Add sample comments for movies
+
+### Test User Credentials
+
+| Email | Password | Role |
+|-------|----------|------|
+| admin@example.com | password123 | admin |
+| john@example.com | password123 | user |
+| jane@example.com | password123 | user |
+| alice@example.com | password123 | user |
+| bob@example.com | password123 | user |
+
+## Test
+
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
+```
 
 ## Features
 

@@ -39,8 +39,19 @@ export class MoviesController {
   async findAll(@Query() queryMovieDto: QueryMovieDto) {
     const result = await this.moviesService.findAll(queryMovieDto);
     return {
-      status: 'success',
+      success: true,
       data: result,
+    };
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const movie = await this.moviesService.findById(id);
+    return {
+      success: true,
+      data: {
+        movie,
+      },
     };
   }
 
@@ -50,7 +61,7 @@ export class MoviesController {
   async create(@Body() createMovieDto: CreateMovieDto) {
     const movie = await this.moviesService.create(createMovieDto);
     return {
-      status: 'success',
+      success: true,
       data: movie,
     };
   }
@@ -65,7 +76,7 @@ export class MoviesController {
   ) {
     const posterUrl = await this.moviesService.uploadPoster(id, file);
     return {
-      status: 'success',
+      success: true,
       data: { posterUrl },
     };
   }
@@ -76,7 +87,7 @@ export class MoviesController {
   async delete(@Param('id') id: string) {
     await this.moviesService.delete(id);
     return {
-      status: 'success',
+      success: true,
       message: 'Movie deleted successfully',
     };
   }
