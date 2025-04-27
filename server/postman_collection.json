@@ -1,0 +1,636 @@
+{
+    "info": {
+        "name": "Movie System API",
+        "description": "Collection for testing Movie System API endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://167.86.87.73/api",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Register User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\",\n  \"name\": \"John Doe\",\n  \"age\": 25,\n  \"gender\": \"male\",\n  \"country\": \"USA\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new user"
+                    }
+                },
+                {
+                    "name": "Register Admin",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123!\",\n  \"name\": \"Admin User\",\n  \"age\": 30,\n  \"gender\": \"male\",\n  \"country\": \"USA\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Register an admin user (will need to be promoted later)"
+                    }
+                },
+                {
+                    "name": "Login User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "pm.environment.set('userToken', jsonData.data.token);",
+                                    "pm.environment.set('userId', jsonData.data.user._id);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login as regular user"
+                    }
+                },
+                {
+                    "name": "Login Admin",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "pm.environment.set('adminToken', jsonData.data.token);",
+                                    "pm.environment.set('adminId', jsonData.data.user._id);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login as admin"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Users",
+            "item": [
+                {
+                    "name": "Update Profile",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Updated User Name\",\n  \"age\": 26\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/users/me",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "me"
+                            ]
+                        },
+                        "description": "Update current user profile"
+                    }
+                },
+                {
+                    "name": "Promote User to Admin",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/{{userId}}/promote",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "{{userId}}",
+                                "promote"
+                            ]
+                        },
+                        "description": "Promote a user to admin (admin only)"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Artists",
+            "item": [
+                {
+                    "name": "Create Artist",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "pm.environment.set('directorId', jsonData.data._id);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Christopher Nolan\",\n  \"bio\": \"British-American film director, producer, and screenwriter.\",\n  \"type\": \"director\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/artists",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "artists"
+                            ]
+                        },
+                        "description": "Create a new artist (admin only)"
+                    }
+                },
+                {
+                    "name": "Create Actor",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "pm.environment.set('actorId', jsonData.data._id);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Leonardo DiCaprio\",\n  \"bio\": \"Academy Award-winning actor.\",\n  \"type\": \"actor\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/artists",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "artists"
+                            ]
+                        },
+                        "description": "Create a new artist (admin only)"
+                    }
+                },
+                {
+                    "name": "Search Artists",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/artists?search=nolan",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "artists"
+                            ],
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "nolan"
+                                }
+                            ]
+                        },
+                        "description": "Search for artists"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Movies",
+            "item": [
+                {
+                    "name": "Get All Movies",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/movies?page=1&limit=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "movies"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "searchTerm",
+                                    "value": "inception",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "genre",
+                                    "value": "Action",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "year",
+                                    "value": "2010",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "Get all movies with optional filtering"
+                    }
+                },
+                {
+                    "name": "Create Movie",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "pm.environment.set('movieId', jsonData.data._id);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Inception\",\n  \"releaseYear\": 2010,\n  \"description\": \"A thief who enters dreams and steals ideas implants one into a CEO's mind.\",\n  \"genres\": [\"Action\", \"Sci-Fi\", \"Thriller\"],\n  \"directorId\": \"{{directorId}}\",\n  \"artistIds\": [\"{{actorId}}\"]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/movies",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "movies"
+                            ]
+                        },
+                        "description": "Create a new movie (admin only)"
+                    }
+                },
+                {
+                    "name": "Upload Movie Poster",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "poster",
+                                    "type": "file",
+                                    "src": "/path/to/poster.jpg"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/movies/{{movieId}}/poster",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "movies",
+                                "{{movieId}}",
+                                "poster"
+                            ]
+                        },
+                        "description": "Upload a movie poster (admin only)"
+                    }
+                },
+                {
+                    "name": "Delete Movie",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/movies/{{movieId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "movies",
+                                "{{movieId}}"
+                            ]
+                        },
+                        "description": "Delete a movie (admin only)"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Ratings",
+            "item": [
+                {
+                    "name": "Rate Movie",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"score\": 4.5\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/movies/{{movieId}}/ratings",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "movies",
+                                "{{movieId}}",
+                                "ratings"
+                            ]
+                        },
+                        "description": "Rate a movie (authenticated)"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Comments",
+            "item": [
+                {
+                    "name": "Add Comment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"text\": \"This is one of the best movies I've ever seen!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/movies/{{movieId}}/comments",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "movies",
+                                "{{movieId}}",
+                                "comments"
+                            ]
+                        },
+                        "description": "Add a comment to a movie (authenticated)"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Statistics",
+            "item": [
+                {
+                    "name": "Get Rating Stats by Age",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/stats/ratings?movieId={{movieId}}&groupBy=age",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "stats",
+                                "ratings"
+                            ],
+                            "query": [
+                                {
+                                    "key": "movieId",
+                                    "value": "{{movieId}}"
+                                },
+                                {
+                                    "key": "groupBy",
+                                    "value": "age"
+                                }
+                            ]
+                        },
+                        "description": "Get movie rating statistics by age demographic"
+                    }
+                },
+                {
+                    "name": "Get Rating Stats by Gender",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/stats/ratings?movieId={{movieId}}&groupBy=gender",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "stats",
+                                "ratings"
+                            ],
+                            "query": [
+                                {
+                                    "key": "movieId",
+                                    "value": "{{movieId}}"
+                                },
+                                {
+                                    "key": "groupBy",
+                                    "value": "gender"
+                                }
+                            ]
+                        },
+                        "description": "Get movie rating statistics by gender demographic"
+                    }
+                },
+                {
+                    "name": "Get Rating Stats by Country",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/stats/ratings?movieId={{movieId}}&groupBy=country",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "stats",
+                                "ratings"
+                            ],
+                            "query": [
+                                {
+                                    "key": "movieId",
+                                    "value": "{{movieId}}"
+                                },
+                                {
+                                    "key": "groupBy",
+                                    "value": "country"
+                                }
+                            ]
+                        },
+                        "description": "Get movie rating statistics by country demographic"
+                    }
+                }
+            ]
+        }
+    ]
+}
