@@ -197,7 +197,7 @@ interface RatingStat {
                       <span *ngIf="commentDeleting !== comment._id">Delete</span>
                     </button>
                   </div>
-                  <p>{{ comment.content }}</p>
+                  <p>{{ getCommentContent(comment) }}</p>
                 </div>
               </div>
             </div>
@@ -250,6 +250,10 @@ export class MovieDetailComponent implements OnInit {
     
     this.authService.user$.subscribe(user => {
       this.currentUserValue = user;
+      // Check user rating when user data changes
+      if (this.movie) {
+        this.checkUserRating();
+      }
     });
   }
 
@@ -269,6 +273,8 @@ export class MovieDetailComponent implements OnInit {
         this.isLoading = false;
         this.calculateRatingStats();
         this.checkUserRating();
+        // Load comments separately
+        this.loadComments();
       },
       error: (error) => {
         this.errorMessage = error.error?.message || 'Failed to load movie details.';
@@ -364,12 +370,9 @@ export class MovieDetailComponent implements OnInit {
     
     this.movieService.addComment(this.movie._id, this.newComment).subscribe({
       next: (response) => {
-        // Update movie comments
-        if (this.movie && response.data && response.data.comments) {
-          this.movie.comments = response.data.comments;
-          this.newComment = ''; // Clear the comment input
-        }
-        
+        // Reload comments after adding a new one
+        this.loadComments();
+        this.newComment = ''; // Clear the comment input
         this.isCommentSubmitting = false;
       },
       error: (error) => {
@@ -379,20 +382,41 @@ export class MovieDetailComponent implements OnInit {
     });
   }
 
+  loadComments(): void {
+    if (!this.movie) return;
+    
+    this.movieService.getComments(this.movie._id).subscribe({
+      next: (response) => {
+        if (this.movie && response.data && response.data.comments) {
+          this.movie.comments = response.data.comments;
+          // Update sorted comments
+          this.sortedComments = [...this.movie.comments].sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          });
+        }
+      },
+      error: (error) => {
+        this.errorMessage = error.error?.message || 'Failed to load comments.';
+      }
+    });
+  }
+
   deleteComment(commentId: string): void {
     if (!this.movie || !this.authService.isLoggedIn) {
       return;
     }
     
+    this.commentDeleting = commentId;
+    
     this.movieService.deleteComment(this.movie._id, commentId).subscribe({
       next: () => {
-        // Remove the comment from the comments array
-        if (this.movie && this.movie.comments) {
-          this.movie.comments = this.movie.comments.filter(comment => comment._id !== commentId);
-        }
+        // Reload comments after deletion
+        this.loadComments();
+        this.commentDeleting = null;
       },
       error: (error) => {
         this.errorMessage = error.error?.message || 'Failed to delete comment.';
+        this.commentDeleting = null;
       }
     });
   }
@@ -459,11 +483,11 @@ export class MovieDetailComponent implements OnInit {
     
     if (!this.movie) return;
     
-    this.statsService.getRatingStats(this.movie._id, filter).subscribe({
+    this.statsService.getRatingStats().subscribe({
       next: (response) => {
         // Adapt this to the actual structure of your response
         const results = response.data.results || [];
-        this.ratingStats = results.map(stat => ({
+        this.ratingStats = results.map((stat: any) => ({
           rating: stat.ageGroup || stat.gender || stat.country || 'Unknown',
           count: 0, // Default value since count might not be available
           percentage: stat.averageRating * 20 // Convert 0-5 to 0-100%
@@ -484,5 +508,9 @@ export class MovieDetailComponent implements OnInit {
       case 'country': return 'Country';
       default: return '';
     }
+  }
+
+  getCommentContent(comment: Comment): string {
+    return comment.content || comment.text || '';
   }
 }

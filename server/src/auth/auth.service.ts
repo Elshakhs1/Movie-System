@@ -55,13 +55,28 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Generate JWT
-    const payload = { email: user.email, sub: user._id, role: user.role };
+    // Extract the user ID safely
+    const userId = user._id ? user._id.toString() : '';
+    
+    // Generate JWT - make sure payload fields match what's used in CurrentUser decorator
+    const payload = { 
+      email: user.email, 
+      sub: userId, // Using the safely extracted ID
+      userId: userId, // Using the safely extracted ID
+      role: user.role 
+    };
+    
+    console.log('Creating JWT with payload:', JSON.stringify(payload));
     const token = this.jwtService.sign(payload);
 
     return {
       token,
-      user,
+      user: {
+        _id: user._id,
+        email: user.email,
+        name: user.name || '',
+        role: user.role
+      },
     };
   }
 

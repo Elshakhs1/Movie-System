@@ -22,7 +22,9 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     // Get the auth token from the service
     const token = this.authService.getToken();
-
+    
+    console.log('Token present:', !!token); // Log if token exists
+    
     // If token exists, clone the request and add the authorization header
     if (token) {
       const authRequest = request.clone({
@@ -31,9 +33,13 @@ export class AuthInterceptor implements HttpInterceptor {
         }
       });
       
+      console.log('Setting Authorization header:', `Bearer ${token.substring(0, 10)}...`); // Log part of the token
+      
       // Handle the cloned request
       return next.handle(authRequest).pipe(
         catchError((error: HttpErrorResponse) => {
+          console.error('Auth error:', error.status, error.message);
+          
           // Handle 401 Unauthorized errors
           if (error.status === 401) {
             this.authService.logout();

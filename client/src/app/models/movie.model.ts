@@ -38,9 +38,12 @@ export interface Rating {
 
 export interface Comment {
   _id: string;
-  content: string;
+  content?: string;  // Client-side field name
+  text?: string;     // Server-side field name
   user: any; // Can be either User object or string ID
-  movie: string;
+  movie?: string;
+  movieId?: string;
+  userId?: string;
   createdAt: string;
   updatedAt: string;
 }

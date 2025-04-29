@@ -16,15 +16,17 @@ import { AuthService } from '../../services/auth.service';
 
       <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div class="bg-base-200 py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form (ngSubmit)="onSubmit()" class="space-y-6">
+          <form (ngSubmit)="onSubmit()" method="post" autocomplete="on" class="space-y-6">
             <div>
               <label for="name" class="label">Full name</label>
               <div class="mt-1">
                 <input 
                   [(ngModel)]="name" 
+                  id="name"
                   name="name" 
                   type="text" 
                   required 
+                  autocomplete="name"
                   class="input input-bordered w-full"
                 />
               </div>
@@ -35,9 +37,11 @@ import { AuthService } from '../../services/auth.service';
               <div class="mt-1">
                 <input 
                   [(ngModel)]="email" 
+                  id="email"
                   name="email" 
                   type="email" 
                   required 
+                  autocomplete="username email"
                   class="input input-bordered w-full"
                 />
               </div>
@@ -47,10 +51,12 @@ import { AuthService } from '../../services/auth.service';
               <label for="password" class="label">Password</label>
               <div class="mt-1">
                 <input 
-                  [(ngModel)]="password" 
+                  [(ngModel)]="password"
+                  id="password" 
                   name="password" 
                   type="password" 
                   required 
+                  autocomplete="new-password"
                   class="input input-bordered w-full"
                 />
               </div>
@@ -64,6 +70,7 @@ import { AuthService } from '../../services/auth.service';
               <div class="mt-1">
                 <input 
                   [(ngModel)]="age" 
+                  id="age"
                   name="age" 
                   type="number" 
                   class="input input-bordered w-full"
@@ -74,7 +81,7 @@ import { AuthService } from '../../services/auth.service';
             <div>
               <label for="gender" class="label">Gender</label>
               <div class="mt-1">
-                <select [(ngModel)]="gender" name="gender" class="select select-bordered w-full">
+                <select [(ngModel)]="gender" id="gender" name="gender" class="select select-bordered w-full">
                   <option value="" disabled selected>Select gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -88,8 +95,10 @@ import { AuthService } from '../../services/auth.service';
               <div class="mt-1">
                 <input 
                   [(ngModel)]="country" 
+                  id="country"
                   name="country" 
                   type="text" 
+                  autocomplete="country-name"
                   class="input input-bordered w-full"
                 />
               </div>
@@ -97,6 +106,10 @@ import { AuthService } from '../../services/auth.service';
 
             <div *ngIf="error" class="alert alert-error">
               {{ error }}
+            </div>
+
+            <div *ngIf="successMessage" class="alert alert-success">
+              {{ successMessage }}
             </div>
 
             <div>
@@ -144,6 +157,7 @@ export class RegisterComponent {
   country = '';
   isLoading = false;
   error = '';
+  successMessage = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -160,6 +174,7 @@ export class RegisterComponent {
 
     this.isLoading = true;
     this.error = '';
+    this.successMessage = '';
 
     const registerData = {
       name: this.name,
@@ -172,10 +187,16 @@ export class RegisterComponent {
 
     this.authService.register(registerData).subscribe({
       next: () => {
+        // Set success message
+        this.successMessage = 'Registration successful! Logging in...';
+        
         // After successful registration, log in the user
         this.authService.login({ email: this.email, password: this.password }).subscribe({
           next: () => {
-            this.router.navigate(['/']);
+            // Delay redirect to allow browser to save credentials
+            setTimeout(() => {
+              this.router.navigate(['/']);
+            }, 1500);
           },
           error: (err) => {
             this.isLoading = false;

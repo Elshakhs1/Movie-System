@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { RatingStatResponse } from '../models/rating.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -10,13 +9,19 @@ import { environment } from '../../environments/environment';
 export class StatsService {
   private apiUrl = `${environment.apiUrl}/stats`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getRatingStats(movieId: string, groupBy: 'age' | 'gender' | 'country'): Observable<RatingStatResponse> {
-    let params = new HttpParams()
-      .set('movieId', movieId)
-      .set('groupBy', groupBy);
-
-    return this.http.get<RatingStatResponse>(`${this.apiUrl}/ratings`, { params });
+  getRatingStats(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/ratings`).pipe(
+      map(response => {
+        if (response.status === 'success') {
+          return {
+            success: true,
+            data: response.data
+          };
+        }
+        return response;
+      })
+    );
   }
 } 

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Artist, ArtistResponse, ArtistsResponse, CreateArtistRequest } from '../models/artist.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Artist } from '../models/artist.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,19 +10,40 @@ import { environment } from '../../environments/environment';
 export class ArtistService {
   private apiUrl = `${environment.apiUrl}/artists`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getArtists(search?: string): Observable<ArtistsResponse> {
-    let params = new HttpParams();
-    
+  getArtists(search?: string): Observable<any> {
+    let queryParams = '';
     if (search) {
-      params = params.set('search', search);
+      queryParams = `?search=${encodeURIComponent(search)}`;
     }
-
-    return this.http.get<ArtistsResponse>(this.apiUrl, { params });
+    
+    return this.http.get<any>(`${this.apiUrl}${queryParams}`).pipe(
+      map(response => {
+        if (response.status === 'success') {
+          return {
+            success: true,
+            data: response.data
+          };
+        }
+        return response;
+      })
+    );
   }
 
-  createArtist(artist: CreateArtistRequest): Observable<ArtistResponse> {
-    return this.http.post<ArtistResponse>(this.apiUrl, artist);
+  getArtistById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(response => {
+        if (response.status === 'success') {
+          return {
+            success: true,
+            data: {
+              artist: response.data
+            }
+          };
+        }
+        return response;
+      })
+    );
   }
 } 

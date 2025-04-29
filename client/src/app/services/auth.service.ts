@@ -43,13 +43,24 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data);
   }
 
-  login(data: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data).pipe(
+  login(data: LoginRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(
       tap(response => {
-        if (response.success) {
+        console.log('Login response:', response); // Debug log
+        
+        if (response.status === 'success') {
+          console.log('Login successful, storing token and user data');
+          
+          // Store token and user info
           localStorage.setItem(this.tokenKey, response.data.token);
           localStorage.setItem(this.userKey, JSON.stringify(response.data.user));
           this.userSubject.next(response.data.user);
+          
+          // Verify data was saved
+          const savedToken = localStorage.getItem(this.tokenKey);
+          console.log('Token saved:', !!savedToken, 'Length:', savedToken?.length);
+        } else {
+          console.error('Login failed:', response);
         }
       })
     );
@@ -88,5 +99,10 @@ export class AuthService {
 
   promoteToAdmin(userId: string): Observable<{ success: boolean; data: User }> {
     return this.http.patch<{ success: boolean; data: User }>(`${environment.apiUrl}/users/${userId}/promote`, {});
+  }
+
+  // Test endpoint to verify if token is valid
+  verifyToken(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/verify-token`);
   }
 } 

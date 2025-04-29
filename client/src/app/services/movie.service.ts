@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { 
   Movie, 
@@ -41,36 +41,105 @@ export class MovieService {
       queryParams = `?${params.toString()}`;
     }
     
-    return this.http.get<MoviesResponse>(`${this.apiUrl}${queryParams}`);
+    return this.http.get<any>(`${this.apiUrl}${queryParams}`).pipe(
+      map(response => {
+        if (response.status === 'success') {
+          return {
+            success: true,
+            data: response.data
+          };
+        }
+        return response;
+      })
+    );
   }
 
   // Get movie by ID
   getMovieById(id: string): Observable<MovieResponse> {
-    return this.http.get<MovieResponse>(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(response => {
+        if (response.status === 'success') {
+          return {
+            success: true,
+            data: {
+              movie: response.data
+            }
+          };
+        }
+        return response;
+      })
+    );
   }
 
   // Add a new rating
   addRating(movieId: string, rating: number): Observable<RatingResponse> {
-    return this.http.post<RatingResponse>(`${this.apiUrl}/${movieId}/ratings`, { rating });
+    return this.http.post<any>(`${this.apiUrl}/${movieId}/ratings`, { rating }).pipe(
+      map(response => {
+        if (response.status === 'success') {
+          return {
+            success: true,
+            data: response.data
+          };
+        }
+        return response;
+      })
+    );
   }
 
   // Get ratings for a movie
   getRatings(movieId: string): Observable<RatingResponse> {
-    return this.http.get<RatingResponse>(`${this.apiUrl}/${movieId}/ratings`);
+    return this.http.get<any>(`${this.apiUrl}/${movieId}/ratings`).pipe(
+      map(response => {
+        if (response.status === 'success') {
+          return {
+            success: true,
+            data: response.data
+          };
+        }
+        return response;
+      })
+    );
   }
 
   // Add a new comment
   addComment(movieId: string, content: string): Observable<CommentResponse> {
-    return this.http.post<CommentResponse>(`${this.apiUrl}/${movieId}/comments`, { content });
+    return this.http.post<any>(`${this.apiUrl}/${movieId}/comments`, { text: content }).pipe(
+      map(response => {
+        if (response.status === 'success') {
+          return {
+            success: true,
+            data: response.data
+          };
+        }
+        return response;
+      })
+    );
   }
 
   // Get comments for a movie
   getComments(movieId: string): Observable<CommentResponse> {
-    return this.http.get<CommentResponse>(`${this.apiUrl}/${movieId}/comments`);
+    return this.http.get<any>(`${this.apiUrl}/${movieId}/comments`).pipe(
+      map(response => {
+        if (response.status === 'success') {
+          return {
+            success: true,
+            data: response.data
+          };
+        }
+        return response;
+      })
+    );
   }
 
   // Delete a comment
   deleteComment(movieId: string, commentId: string): Observable<{ success: boolean }> {
-    return this.http.delete<{ success: boolean }>(`${this.apiUrl}/${movieId}/comments/${commentId}`);
+    return this.http.delete<any>(`${this.apiUrl}/${movieId}/comments/${commentId}`).pipe(
+      map(response => {
+        if (response.status === 'success') {
+          return { success: true };
+        }
+        return { success: false };
+      })
+    );
   }
 } 

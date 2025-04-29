@@ -16,15 +16,17 @@ import { AuthService } from '../../services/auth.service';
 
       <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div class="bg-base-200 py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form (ngSubmit)="onSubmit()" class="space-y-6">
+          <form (ngSubmit)="onSubmit()" method="post" autocomplete="on" class="space-y-6">
             <div>
               <label for="email" class="label">Email address</label>
               <div class="mt-1">
                 <input 
                   [(ngModel)]="email" 
+                  id="email"
                   name="email" 
                   type="email" 
                   required 
+                  autocomplete="username email"
                   class="input input-bordered w-full"
                 />
               </div>
@@ -37,9 +39,11 @@ import { AuthService } from '../../services/auth.service';
               <div class="mt-1">
                 <input 
                   [(ngModel)]="password" 
+                  id="password"
                   name="password" 
                   type="password" 
                   required 
+                  autocomplete="current-password"
                   class="input input-bordered w-full"
                 />
               </div>
@@ -47,6 +51,10 @@ import { AuthService } from '../../services/auth.service';
 
             <div *ngIf="error" class="alert alert-error">
               {{ error }}
+            </div>
+
+            <div *ngIf="successMessage" class="alert alert-success">
+              {{ successMessage }}
             </div>
 
             <div>
@@ -90,6 +98,7 @@ export class LoginComponent {
   password = '';
   isLoading = false;
   error = '';
+  successMessage = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -101,10 +110,17 @@ export class LoginComponent {
 
     this.isLoading = true;
     this.error = '';
+    this.successMessage = '';
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: () => {
-        this.router.navigate(['/']);
+        // Show success message
+        this.successMessage = 'Login successful! Redirecting...';
+        
+        // Delay redirect to allow browser to save credentials
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 1500);
       },
       error: (err) => {
         this.isLoading = false;
