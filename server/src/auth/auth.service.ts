@@ -40,6 +40,32 @@ export class AuthService {
     return await newUser.save();
   }
 
+  async registerAdmin(registerDto: RegisterDto): Promise<User> {
+    const { email, password, ...rest } = registerDto;
+
+    // Check if user already exists
+    const existingUser = await this.userModel.findOne({ email }).exec();
+    if (existingUser) {
+      throw new BadRequestException('Email already in use');
+    }
+
+    // Hash password
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
+
+    // Create new admin user
+    const newUser = new this.userModel({
+      email,
+      passwordHash,
+      role: 'admin', // Admin role
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...rest,
+    });
+
+    return await newUser.save();
+  }
+
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
 

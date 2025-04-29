@@ -19,6 +19,16 @@ export class AuthController {
     };
   }
 
+  @Post('register-admin')
+  async registerAdmin(@Body() registerDto: RegisterDto) {
+    const user = await this.authService.registerAdmin(registerDto);
+    return {
+      status: 'success',
+      message: 'Admin user registered',
+      data: { _id: user._id },
+    };
+  }
+
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     const result = await this.authService.login(loginDto);

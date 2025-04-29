@@ -1,16 +1,9 @@
 {
     "info": {
         "name": "Movie System API",
-        "description": "Collection for testing Movie System API endpoints",
+        "description": "A collection of requests to test the Movie System API endpoints",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
-    "variable": [
-        {
-            "key": "baseUrl",
-            "value": "http://167.86.87.73/api",
-            "type": "string"
-        }
-    ],
     "item": [
         {
             "name": "Authentication",
@@ -27,7 +20,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\",\n  \"name\": \"John Doe\",\n  \"age\": 25,\n  \"gender\": \"male\",\n  \"country\": \"USA\"\n}"
+                            "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"name\": \"Test User\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/auth/register",
@@ -54,31 +47,30 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123!\",\n  \"name\": \"Admin User\",\n  \"age\": 30,\n  \"gender\": \"male\",\n  \"country\": \"USA\"\n}"
+                            "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"password123\",\n    \"name\": \"Admin User\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/auth/register",
+                            "raw": "{{baseUrl}}/auth/register-admin",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "auth",
-                                "register"
+                                "register-admin"
                             ]
                         },
-                        "description": "Register an admin user (will need to be promoted later)"
+                        "description": "Register a new admin user"
                     }
                 },
                 {
-                    "name": "Login User",
+                    "name": "Login",
                     "event": [
                         {
                             "listen": "test",
                             "script": {
                                 "exec": [
                                     "var jsonData = pm.response.json();",
-                                    "pm.environment.set('userToken', jsonData.data.token);",
-                                    "pm.environment.set('userId', jsonData.data.user._id);"
+                                    "pm.environment.set(\"authToken\", jsonData.data.token);"
                                 ],
                                 "type": "text/javascript"
                             }
@@ -94,7 +86,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\"\n}"
+                            "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/auth/login",
@@ -106,47 +98,30 @@
                                 "login"
                             ]
                         },
-                        "description": "Login as regular user"
+                        "description": "Login with credentials and receive a JWT token"
                     }
                 },
                 {
-                    "name": "Login Admin",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "var jsonData = pm.response.json();",
-                                    "pm.environment.set('adminToken', jsonData.data.token);",
-                                    "pm.environment.set('adminId', jsonData.data.user._id);"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
+                    "name": "Verify Token",
                     "request": {
-                        "method": "POST",
+                        "method": "GET",
                         "header": [
                             {
-                                "key": "Content-Type",
-                                "value": "application/json"
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
                             }
                         ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123!\"\n}"
-                        },
                         "url": {
-                            "raw": "{{baseUrl}}/auth/login",
+                            "raw": "{{baseUrl}}/auth/verify-token",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "auth",
-                                "login"
+                                "verify-token"
                             ]
                         },
-                        "description": "Login as admin"
+                        "description": "Verify if JWT token is valid"
                     }
                 }
             ]
@@ -165,12 +140,12 @@
                             },
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{userToken}}"
+                                "value": "Bearer {{authToken}}"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"name\": \"Updated User Name\",\n  \"age\": 26\n}"
+                            "raw": "{\n    \"name\": \"Updated User Name\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/users/me",
@@ -182,7 +157,7 @@
                                 "me"
                             ]
                         },
-                        "description": "Update current user profile"
+                        "description": "Update user profile"
                     }
                 },
                 {
@@ -192,133 +167,27 @@
                         "header": [
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{adminToken}}"
+                                "value": "Bearer {{authToken}}"
                             }
                         ],
                         "url": {
-                            "raw": "{{baseUrl}}/users/{{userId}}/promote",
+                            "raw": "{{baseUrl}}/users/:id/promote",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "users",
-                                "{{userId}}",
+                                ":id",
                                 "promote"
-                            ]
-                        },
-                        "description": "Promote a user to admin (admin only)"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Artists",
-            "item": [
-                {
-                    "name": "Create Artist",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "var jsonData = pm.response.json();",
-                                    "pm.environment.set('directorId', jsonData.data._id);"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{adminToken}}"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"name\": \"Christopher Nolan\",\n  \"bio\": \"British-American film director, producer, and screenwriter.\",\n  \"type\": \"director\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{baseUrl}}/artists",
-                            "host": [
-                                "{{baseUrl}}"
                             ],
-                            "path": [
-                                "artists"
-                            ]
-                        },
-                        "description": "Create a new artist (admin only)"
-                    }
-                },
-                {
-                    "name": "Create Actor",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "var jsonData = pm.response.json();",
-                                    "pm.environment.set('actorId', jsonData.data._id);"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{adminToken}}"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"name\": \"Leonardo DiCaprio\",\n  \"bio\": \"Academy Award-winning actor.\",\n  \"type\": \"actor\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{baseUrl}}/artists",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "artists"
-                            ]
-                        },
-                        "description": "Create a new artist (admin only)"
-                    }
-                },
-                {
-                    "name": "Search Artists",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/artists?search=nolan",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "artists"
-                            ],
-                            "query": [
+                            "variable": [
                                 {
-                                    "key": "search",
-                                    "value": "nolan"
+                                    "key": "id",
+                                    "value": "userId"
                                 }
                             ]
                         },
-                        "description": "Search for artists"
+                        "description": "Promote a user to admin (requires admin role)"
                     }
                 }
             ]
@@ -330,9 +199,8 @@
                     "name": "Get All Movies",
                     "request": {
                         "method": "GET",
-                        "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/movies?page=1&limit=10",
+                            "raw": "{{baseUrl}}/movies?page=1&limit=10&searchTerm=action&genre=thriller&year=2022",
                             "host": [
                                 "{{baseUrl}}"
                             ],
@@ -350,18 +218,15 @@
                                 },
                                 {
                                     "key": "searchTerm",
-                                    "value": "inception",
-                                    "disabled": true
+                                    "value": "action"
                                 },
                                 {
                                     "key": "genre",
-                                    "value": "Action",
-                                    "disabled": true
+                                    "value": "thriller"
                                 },
                                 {
                                     "key": "year",
-                                    "value": "2010",
-                                    "disabled": true
+                                    "value": "2022"
                                 }
                             ]
                         },
@@ -369,19 +234,30 @@
                     }
                 },
                 {
+                    "name": "Get Movie by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/movies/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "movies",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "movieId"
+                                }
+                            ]
+                        },
+                        "description": "Get a specific movie by ID"
+                    }
+                },
+                {
                     "name": "Create Movie",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "var jsonData = pm.response.json();",
-                                    "pm.environment.set('movieId', jsonData.data._id);"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
                     "request": {
                         "method": "POST",
                         "header": [
@@ -391,12 +267,12 @@
                             },
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{adminToken}}"
+                                "value": "Bearer {{authToken}}"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"title\": \"Inception\",\n  \"releaseYear\": 2010,\n  \"description\": \"A thief who enters dreams and steals ideas implants one into a CEO's mind.\",\n  \"genres\": [\"Action\", \"Sci-Fi\", \"Thriller\"],\n  \"directorId\": \"{{directorId}}\",\n  \"artistIds\": [\"{{actorId}}\"]\n}"
+                            "raw": "{\n    \"title\": \"Test Movie\",\n    \"description\": \"A test movie description\",\n    \"releaseYear\": 2023,\n    \"genres\": [\"Action\", \"Drama\"],\n    \"duration\": 120,\n    \"director\": \"directorId\",\n    \"cast\": [\"castMember1Id\", \"castMember2Id\"]\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/movies",
@@ -417,31 +293,37 @@
                         "header": [
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{adminToken}}"
+                                "value": "Bearer {{authToken}}"
                             }
                         ],
                         "body": {
                             "mode": "formdata",
                             "formdata": [
                                 {
-                                    "key": "poster",
+                                    "key": "file",
                                     "type": "file",
-                                    "src": "/path/to/poster.jpg"
+                                    "src": ""
                                 }
                             ]
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/movies/{{movieId}}/poster",
+                            "raw": "{{baseUrl}}/movies/:id/poster",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "movies",
-                                "{{movieId}}",
+                                ":id",
                                 "poster"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "movieId"
+                                }
                             ]
                         },
-                        "description": "Upload a movie poster (admin only)"
+                        "description": "Upload a poster for a movie (admin only)"
                     }
                 },
                 {
@@ -451,20 +333,128 @@
                         "header": [
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{adminToken}}"
+                                "value": "Bearer {{authToken}}"
                             }
                         ],
                         "url": {
-                            "raw": "{{baseUrl}}/movies/{{movieId}}",
+                            "raw": "{{baseUrl}}/movies/:id",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "movies",
-                                "{{movieId}}"
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "movieId"
+                                }
                             ]
                         },
                         "description": "Delete a movie (admin only)"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Comments",
+            "item": [
+                {
+                    "name": "Get Movie Comments",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/movies/:movieId/comments",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "movies",
+                                ":movieId",
+                                "comments"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "movieId",
+                                    "value": "movieId"
+                                }
+                            ]
+                        },
+                        "description": "Get all comments for a movie"
+                    }
+                },
+                {
+                    "name": "Add Comment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"text\": \"This is a test comment on the movie.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/movies/:movieId/comments",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "movies",
+                                ":movieId",
+                                "comments"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "movieId",
+                                    "value": "movieId"
+                                }
+                            ]
+                        },
+                        "description": "Add a comment to a movie"
+                    }
+                },
+                {
+                    "name": "Delete Comment",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/movies/:movieId/comments/:commentId",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "movies",
+                                ":movieId",
+                                "comments",
+                                ":commentId"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "movieId",
+                                    "value": "movieId"
+                                },
+                                {
+                                    "key": "commentId",
+                                    "value": "commentId"
+                                }
+                            ]
+                        },
+                        "description": "Delete a comment"
                     }
                 }
             ]
@@ -483,34 +473,62 @@
                             },
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{userToken}}"
+                                "value": "Bearer {{authToken}}"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"score\": 4.5\n}"
+                            "raw": "{\n    \"score\": 4\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/movies/{{movieId}}/ratings",
+                            "raw": "{{baseUrl}}/movies/:movieId/ratings",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "movies",
-                                "{{movieId}}",
+                                ":movieId",
                                 "ratings"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "movieId",
+                                    "value": "movieId"
+                                }
                             ]
                         },
-                        "description": "Rate a movie (authenticated)"
+                        "description": "Rate a movie (1-5 stars)"
                     }
                 }
             ]
         },
         {
-            "name": "Comments",
+            "name": "Artists",
             "item": [
                 {
-                    "name": "Add Comment",
+                    "name": "Get Artists",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/artists?search=Tom",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "artists"
+                            ],
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "Tom"
+                                }
+                            ]
+                        },
+                        "description": "Get list of artists with optional search"
+                    }
+                },
+                {
+                    "name": "Create Artist",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -520,25 +538,23 @@
                             },
                             {
                                 "key": "Authorization",
-                                "value": "Bearer {{userToken}}"
+                                "value": "Bearer {{authToken}}"
                             }
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"text\": \"This is one of the best movies I've ever seen!\"\n}"
+                            "raw": "{\n    \"name\": \"Test Artist\",\n    \"bio\": \"A brief biography of the artist\",\n    \"type\": \"actor\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/movies/{{movieId}}/comments",
+                            "raw": "{{baseUrl}}/artists",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "movies",
-                                "{{movieId}}",
-                                "comments"
+                                "artists"
                             ]
                         },
-                        "description": "Add a comment to a movie (authenticated)"
+                        "description": "Create a new artist (admin only)"
                     }
                 }
             ]
@@ -547,12 +563,11 @@
             "name": "Statistics",
             "item": [
                 {
-                    "name": "Get Rating Stats by Age",
+                    "name": "Get Rating Stats",
                     "request": {
                         "method": "GET",
-                        "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/stats/ratings?movieId={{movieId}}&groupBy=age",
+                            "raw": "{{baseUrl}}/stats/ratings?movieId=movieId&groupBy=age",
                             "host": [
                                 "{{baseUrl}}"
                             ],
@@ -563,7 +578,7 @@
                             "query": [
                                 {
                                     "key": "movieId",
-                                    "value": "{{movieId}}"
+                                    "value": "movieId"
                                 },
                                 {
                                     "key": "groupBy",
@@ -571,66 +586,17 @@
                                 }
                             ]
                         },
-                        "description": "Get movie rating statistics by age demographic"
-                    }
-                },
-                {
-                    "name": "Get Rating Stats by Gender",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/stats/ratings?movieId={{movieId}}&groupBy=gender",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "stats",
-                                "ratings"
-                            ],
-                            "query": [
-                                {
-                                    "key": "movieId",
-                                    "value": "{{movieId}}"
-                                },
-                                {
-                                    "key": "groupBy",
-                                    "value": "gender"
-                                }
-                            ]
-                        },
-                        "description": "Get movie rating statistics by gender demographic"
-                    }
-                },
-                {
-                    "name": "Get Rating Stats by Country",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/stats/ratings?movieId={{movieId}}&groupBy=country",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "stats",
-                                "ratings"
-                            ],
-                            "query": [
-                                {
-                                    "key": "movieId",
-                                    "value": "{{movieId}}"
-                                },
-                                {
-                                    "key": "groupBy",
-                                    "value": "country"
-                                }
-                            ]
-                        },
-                        "description": "Get movie rating statistics by country demographic"
+                        "description": "Get rating statistics grouped by demographic (age, gender, country)"
                     }
                 }
             ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3000/api",
+            "type": "string"
         }
     ]
 }

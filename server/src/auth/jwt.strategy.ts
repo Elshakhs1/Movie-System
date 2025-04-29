@@ -1,6 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -14,20 +14,42 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: configService.get<string>('JWT_SECRET'),
     });
     
-    this.logger.log(`JWT Strategy initialized with secret key: ${configService.get<string>('JWT_SECRET')?.substring(0, 3)}...`);
+    const secret = configService.get<string>('JWT_SECRET');
+    this.logger.log(`JWT Strategy initialized with secret key: ${secret?.substring(0, 3)}...`);
+    
+    if (!secret) {
+      this.logger.error('WARNING: JWT_SECRET is not set or empty!');
+    }
   }
 
   async validate(payload: any) {
-    this.logger.log('JWT payload being validated:', JSON.stringify(payload));
-    
-    // Create a standardized user object
-    const userObj = { 
-      userId: payload.userId || payload.sub, // Support both formats
-      email: payload.email, 
-      role: payload.role 
-    };
-    
-    this.logger.log('Returning user object:', JSON.stringify(userObj));
-    return userObj;
+    try {
+      this.logger.log('JWT validation attempt...');
+      this.logger.log('JWT payload being validated:', JSON.stringify(payload));
+      
+      if (!payload) {
+        this.logger.error('JWT validation failed: Empty payload');
+        throw new UnauthorizedException('Invalid token payload');
+      }
+      
+      // Validate required fields
+      if (!payload.sub && !payload.userId) {
+        this.logger.error('JWT validation failed: Missing user identifier (sub or userId)');
+        throw new UnauthorizedException('Invalid token: missing user identifier');
+      }
+      
+      // Create a standardized user object
+      const userObj = { 
+        userId: payload.userId || payload.sub, // Support both formats
+        email: payload.email, 
+        role: payload.role || 'user' // Default to user role if not specified
+      };
+      
+      this.logger.log('JWT validation successful - Returning user object:', JSON.stringify(userObj));
+      return userObj;
+    } catch (error) {
+      this.logger.error(`JWT validation error: ${error.message}`, error.stack);
+      throw error;
+    }
   }
 } 
