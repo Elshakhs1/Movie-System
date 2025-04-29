@@ -19,7 +19,7 @@ export class CommentsService {
       throw new NotFoundException('Movie not found');
     }
 
-    // Find comments for this movie
+    // Find comments for this movie and fully populate the userId field
     return this.commentModel.find({ movieId })
       .populate('userId', 'name email')
       .sort({ createdAt: -1 })
