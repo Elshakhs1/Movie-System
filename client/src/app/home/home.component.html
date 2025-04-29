@@ -1,0 +1,61 @@
+<div class="min-h-screen bg-base-200">
+  <div class="hero bg-base-100 py-12 shadow-md">
+    <div class="hero-content text-center">
+      <div class="max-w-md">
+        <h1 class="text-5xl font-bold">Welcome {{ user?.name || 'User' }}!</h1>
+        <p class="py-6">Explore our collection of movies, rate them, and join the discussions.</p>
+        <div class="flex gap-4 justify-center">
+          <a routerLink="/movies" class="btn btn-primary">Browse Movies</a>
+          <a routerLink="/profile" class="btn btn-outline">Your Profile</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Featured Movies -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-2xl">Movie Collection</h2>
+          <p>Browse through our collection of movies with detailed information.</p>
+          <div class="card-actions justify-end">
+            <a routerLink="/movies" class="btn btn-primary">Browse</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-2xl">Movie Reviews</h2>
+          <p>Read and write comments on your favorite movies.</p>
+          <div class="card-actions justify-end">
+            <a routerLink="/movies" class="btn btn-primary">See Movies</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ratings -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-2xl">Movie Ratings</h2>
+          <p>Rate movies on a scale of 1-5 and see what others think.</p>
+          <div class="card-actions justify-end">
+            <a routerLink="/movies" class="btn btn-primary">Rate Movies</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Access Section -->
+    <div class="mt-12">
+      <h2 class="text-3xl font-bold mb-6 text-center">Quick Access</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <a routerLink="/movies" class="btn btn-outline btn-block">Movies</a>
+        <a routerLink="/profile" class="btn btn-outline btn-block">Profile</a>
+        <a (click)="logout()" class="btn btn-outline btn-block">Logout</a>
+      </div>
+    </div>
+  </div>
+</div> 

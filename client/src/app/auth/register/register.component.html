@@ -1,0 +1,83 @@
+<div class="hero min-h-screen bg-base-200">
+  <div class="hero-content flex-col lg:flex-row">
+    <div class="text-center lg:text-left lg:mr-8">
+      <h1 class="text-5xl font-bold">Join us today!</h1>
+      <p class="py-6">Create your account to access our movie collection, rate films, save favorites, and join discussions with fellow movie enthusiasts.</p>
+    </div>
+    <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+      <div class="card-body">
+        <h2 class="text-2xl font-bold text-center mb-4 text-primary">Register</h2>
+        
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Name</span>
+            </label>
+            <input 
+              type="text" 
+              placeholder="Your name" 
+              class="input input-bordered input-primary" 
+              formControlName="name"
+            />
+            <div *ngIf="registerForm.get('name')?.touched && registerForm.get('name')?.invalid" class="text-error text-sm mt-1">
+              <div *ngIf="registerForm.get('name')?.errors?.['required']">Name is required</div>
+            </div>
+          </div>
+
+          <div class="form-control mt-4">
+            <label class="label">
+              <span class="label-text">Email</span>
+            </label>
+            <input 
+              type="email" 
+              placeholder="email@example.com" 
+              class="input input-bordered input-primary" 
+              formControlName="email"
+            />
+            <div *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid" class="text-error text-sm mt-1">
+              <div *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</div>
+              <div *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</div>
+            </div>
+          </div>
+          
+          <div class="form-control mt-4">
+            <label class="label">
+              <span class="label-text">Password</span>
+            </label>
+            <input 
+              type="password" 
+              placeholder="******" 
+              class="input input-bordered input-primary" 
+              formControlName="password"
+            />
+            <div *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid" class="text-error text-sm mt-1">
+              <div *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</div>
+              <div *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+            </div>
+            <label class="label">
+              <a routerLink="/auth/login" class="label-text-alt link link-hover text-primary">Already have an account? Login here</a>
+            </label>
+          </div>
+          
+          <div *ngIf="errorMessage" class="alert alert-error mt-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ errorMessage }}</span>
+          </div>
+          
+          <div class="form-control mt-6">
+            <button 
+              class="btn btn-primary" 
+              [disabled]="registerForm.invalid || isLoading"
+              type="submit"
+            >
+              <span *ngIf="isLoading" class="loading loading-spinner loading-sm"></span>
+              Register
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> 

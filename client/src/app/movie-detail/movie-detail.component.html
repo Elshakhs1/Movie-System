@@ -1,0 +1,174 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="flex justify-center my-16">
+    <span class="loading loading-spinner loading-lg text-primary"></span>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="errorMessage" class="alert alert-error mb-8">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Movie Details -->
+  <div *ngIf="!isLoading && movie" class="mb-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Movie Poster -->
+      <div class="lg:w-1/3">
+        <div class="card bg-base-100 shadow-xl">
+          <figure class="h-96 lg:h-[500px]">
+            <img *ngIf="movie.posterUrl" [src]="movie.posterUrl" [alt]="movie.title" class="object-cover w-full h-full" />
+            <div *ngIf="!movie.posterUrl" class="w-full h-full flex items-center justify-center bg-base-300">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-24 h-24 text-base-content opacity-40">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5z" />
+              </svg>
+            </div>
+          </figure>
+        </div>
+      </div>
+      
+      <!-- Movie Info -->
+      <div class="lg:w-2/3">
+        <!-- Back Button -->
+        <a routerLink="/movies" class="btn btn-sm btn-ghost mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+          Back to Movies
+        </a>
+        
+        <h1 class="text-4xl font-bold mb-2">{{ movie.title }}</h1>
+        
+        <div class="flex items-center gap-4 mb-4">
+          <div class="badge badge-primary">{{ movie.releaseYear }}</div>
+          <div *ngIf="movie.duration" class="badge badge-outline">{{ movie.duration }} min</div>
+          <div *ngFor="let genre of movie.genres" class="badge badge-secondary">{{ genre }}</div>
+        </div>
+        
+        <!-- Ratings -->
+        <div class="flex items-center gap-4 mb-6">
+          <div class="flex items-center">
+            <span class="font-bold text-lg mr-2">{{ movie.avgRating | number:'1.1-1' }}</span>
+            <div class="rating rating-sm">
+              <ng-container *ngFor="let i of [1, 2, 3, 4, 5]">
+                <input type="radio" [disabled]="true" class="mask mask-star-2" [class.bg-orange-400]="i <= movie.avgRating" />
+              </ng-container>
+            </div>
+            <span class="ml-1 text-sm opacity-70">({{ movie.ratingsCount || 0 }} ratings)</span>
+          </div>
+          
+          <div class="divider divider-horizontal mx-0"></div>
+          
+          <!-- User Rating -->
+          <div>
+            <span class="text-sm mr-2">Your Rating:</span>
+            <div class="rating rating-sm">
+              <ng-container *ngFor="let i of [1, 2, 3, 4, 5]">
+                <input 
+                  type="radio" 
+                  class="mask mask-star-2 bg-orange-400" 
+                  [checked]="userRating === i"
+                  [disabled]="isRatingSubmitting"
+                  (click)="submitRating(i)"
+                />
+              </ng-container>
+            </div>
+            <span *ngIf="isRatingSubmitting" class="loading loading-spinner loading-xs ml-2"></span>
+          </div>
+        </div>
+        
+        <!-- Synopsis -->
+        <div class="mb-6">
+          <h2 class="text-xl font-bold mb-2">Synopsis</h2>
+          <p class="text-base-content opacity-90">{{ movie.description }}</p>
+        </div>
+        
+        <!-- Cast & Crew -->
+        <div *ngIf="movie.cast?.length || movie.director" class="mb-6">
+          <h2 class="text-xl font-bold mb-2">Cast & Crew</h2>
+          
+          <div *ngIf="movie.director" class="mb-2">
+            <span class="font-semibold">Director:</span> {{ movie.director?.name }}
+          </div>
+          
+          <div *ngIf="movie.cast?.length" class="flex flex-wrap gap-2">
+            <span class="font-semibold">Cast:</span>
+            <div *ngFor="let actor of movie.cast">
+              <span class="badge badge-ghost">{{ actor.name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comments Section -->
+  <div *ngIf="!isLoading && movie" class="card bg-base-100 shadow-xl mt-8">
+    <div class="card-body">
+      <h2 class="card-title">Comments</h2>
+      
+      <!-- Add Comment Form -->
+      <form [formGroup]="commentForm" (ngSubmit)="submitComment()" class="mb-6">
+        <div class="form-control">
+          <textarea 
+            formControlName="comment" 
+            class="textarea textarea-bordered h-24" 
+            placeholder="Add your comment..."
+          ></textarea>
+          <div *ngIf="commentForm.get('comment')?.touched && commentForm.get('comment')?.invalid" class="text-error text-sm mt-1">
+            <div *ngIf="commentForm.get('comment')?.errors?.['required']">Comment is required</div>
+            <div *ngIf="commentForm.get('comment')?.errors?.['minlength']">Comment must be at least 3 characters</div>
+          </div>
+        </div>
+        <div class="form-control mt-4">
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="commentForm.invalid || isSubmittingComment"
+          >
+            <span *ngIf="isSubmittingComment" class="loading loading-spinner loading-sm"></span>
+            Post Comment
+          </button>
+        </div>
+      </form>
+      
+      <!-- Comments List -->
+      <div *ngIf="isLoadingComments" class="flex justify-center my-4">
+        <span class="loading loading-spinner loading-md text-primary"></span>
+      </div>
+      
+      <div *ngIf="!isLoadingComments && comments.length === 0" class="alert my-4">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>No comments yet. Be the first to comment!</span>
+      </div>
+      
+      <div *ngIf="!isLoadingComments && comments.length > 0" class="space-y-4">
+        <div *ngFor="let comment of comments" class="bg-base-200 p-4 rounded-box">
+          <div class="flex justify-between items-start">
+            <div class="flex items-center gap-2">
+              <div class="avatar">
+                <div class="w-8 rounded-full">
+                  <img src="https://ui-avatars.com/api/?name={{comment.user.name}}&background=random" alt="User avatar" />
+                </div>
+              </div>
+              <div>
+                <div class="font-semibold">{{ comment.user.name }}</div>
+                <div class="text-xs opacity-70">{{ comment.createdAt | date:'medium' }}</div>
+              </div>
+            </div>
+            <button *ngIf="comment.user._id === userProfile?._id" class="btn btn-ghost btn-xs" (click)="deleteComment(comment._id)">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+              </svg>
+            </button>
+          </div>
+          <p class="mt-2">{{ comment.text }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

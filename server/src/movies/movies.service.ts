@@ -105,8 +105,8 @@ export class MoviesService {
   async uploadPoster(id: string, file: MulterFile): Promise<string> {
     const movie = await this.findById(id);
     
-    // Set poster URL (could be a relative path or full URL depending on your setup)
-    const baseUrl = this.configService.get<string>('BASE_URL') || 'http://localhost:3000';
+    // Set poster URL with the server's actual IP address instead of localhost
+    const baseUrl = this.configService.get<string>('BASE_URL') || 'http://167.86.87.73:3000';
     const posterUrl = `${baseUrl}/uploads/${file.filename}`;
     
     movie.posterUrl = posterUrl;

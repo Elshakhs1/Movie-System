@@ -1,0 +1,47 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-4xl font-bold mb-8 text-center">My Profile</h1>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="flex justify-center my-8">
+    <span class="loading loading-spinner loading-lg text-primary"></span>
+  </div>
+
+  <div *ngIf="!isLoading" class="card bg-base-100 shadow-xl max-w-2xl mx-auto">
+    <div class="card-body">
+      <div class="flex flex-col items-center mb-6">
+        <div class="avatar mb-4">
+          <div class="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+            <img src="https://ui-avatars.com/api/?name={{userProfile.email}}&background=random" alt="Profile picture" />
+          </div>
+        </div>
+        <h2 class="card-title text-2xl">{{ userProfile.email }}</h2>
+        <div class="badge badge-primary mt-2">{{ userProfile.role }}</div>
+      </div>
+      
+      <div class="divider"></div>
+
+      <!-- Alerts -->
+      <div *ngIf="errorMessage" class="alert alert-error mt-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+      
+      <!-- View Info -->
+      <div class="mt-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 class="font-semibold">Email</h3>
+            <p>{{ userProfile.email }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-semibold">User ID</h3>
+            <p>{{ userProfile.userId }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
